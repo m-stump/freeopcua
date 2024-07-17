@@ -14,7 +14,7 @@ option(SSL_SUPPORT_MBEDTLS "Support rsa-oaep password encryption using mbedtls l
 
 option(BUILD_PYTHON "Build Python bindings" ON)
 option(BUILD_TESTING "Build and run tests" OFF)
-OPTION(BUILD_SHARED_LIBS "Build shared libraries." ON)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 IF (NOT DEFINED CMAKE_INSTALL_LIBDIR)
     SET(CMAKE_INSTALL_LIBDIR lib)
