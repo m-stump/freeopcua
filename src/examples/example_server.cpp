@@ -64,12 +64,12 @@ void RunServer()
 
   //browse root node on server side
   Node root = server.GetRootNode();
-  logger->info("Root node is: {}", fmt::streamed(root));
+  logger->info("Root node is: {}", fmt::streamed(root).value());
   logger->info("Children are:");
 
   for (Node node : root.GetChildren())
     {
-      logger->info("    {}", fmt::streamed(node));
+      logger->info("    {}", fmt::streamed(node).value());
     }
 
 

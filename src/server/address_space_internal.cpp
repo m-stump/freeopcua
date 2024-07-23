@@ -106,18 +106,18 @@ std::vector<BrowseResult> AddressSpaceInMemory::Browse(const OpcUa::NodesQuery &
       if (Logger && Logger->should_log(spdlog::level::trace))
         {
           Logger->trace("address_space_internal| browsing");
-          Logger->trace("  NodeId: '{}'", fmt::streamed(browseDescription.NodeToBrowse));
-          Logger->trace("  ReferenceId: '{}'",fmt::streamed( browseDescription.ReferenceTypeId));
-          Logger->trace("  Direction: {}", fmt::streamed(browseDescription.Direction));
-          Logger->trace("  NodeClasses: {:#x}", fmt::streamed((unsigned)browseDescription.NodeClasses));
-          Logger->trace("  ResultMask:  {:#x}", fmt::streamed((unsigned)browseDescription.ResultMask));
+          Logger->trace("  NodeId: '{}'", fmt::streamed(browseDescription.NodeToBrowse).value());
+          Logger->trace("  ReferenceId: '{}'",fmt::streamed( browseDescription.ReferenceTypeId).value());
+          Logger->trace("  Direction: {}", fmt::streamed(browseDescription.Direction).value());
+          Logger->trace("  NodeClasses: {:#x}", fmt::streamed((unsigned)browseDescription.NodeClasses).value());
+          Logger->trace("  ResultMask:  {:#x}", fmt::streamed((unsigned)browseDescription.ResultMask).value());
         }
 
       NodesMap::const_iterator node_it = Nodes.find(browseDescription.NodeToBrowse);
 
       if (node_it == Nodes.end())
         {
-          LOG_WARN(Logger, "address_space_internal| Node '{}' not found in the address space", fmt::streamed(OpcUa::ToString(browseDescription.NodeToBrowse)));
+          LOG_WARN(Logger, "address_space_internal| Node '{}' not found in the address space", fmt::streamed(OpcUa::ToString(browseDescription.NodeToBrowse)).value());
 
           continue;
         }
@@ -276,13 +276,13 @@ uint32_t AddressSpaceInMemory::AddDataChangeCallback(const NodeId & node, Attrib
 {
   boost::unique_lock<boost::shared_mutex> lock(DbMutex);
 
-  LOG_DEBUG(Logger, "address_space_internal| set data changes callback for node {} and attribute {}", fmt::streamed(node), fmt::streamed((unsigned)attribute));
+  LOG_DEBUG(Logger, "address_space_internal| set data changes callback for node {} and attribute {}", fmt::streamed(node).value(), fmt::streamed((unsigned)attribute).value());
 
   NodesMap::iterator it = Nodes.find(node);
 
   if (it == Nodes.end())
     {
-      LOG_ERROR(Logger, "address_space_internal| Node: '{}' not found", fmt::streamed(node));
+      LOG_ERROR(Logger, "address_space_internal| Node: '{}' not found", fmt::streamed(node).value());
       throw std::runtime_error("address_space_internal| NodeId not found");
     }
 
@@ -290,7 +290,7 @@ uint32_t AddressSpaceInMemory::AddDataChangeCallback(const NodeId & node, Attrib
 
   if (ait == it->second.Attributes.end())
     {
-      LOG_ERROR(Logger, "address_space_internal| Attribute: {} of node: ‘{}‘ not found", fmt::streamed((unsigned)attribute), fmt::streamed(node));
+      LOG_ERROR(Logger, "address_space_internal| Attribute: {} of node: ‘{}‘ not found", fmt::streamed((unsigned)attribute).value(), fmt::streamed(node).value());
       throw std::runtime_error("Attribute not found");
     }
 
@@ -420,7 +420,7 @@ CallMethodResult AddressSpaceInMemory::CallMethod(CallMethodRequest request)
 
   catch (std::exception & ex)
     {
-      LOG_ERROR(Logger, "address_space_internal| exception while calling method: {}: {}", fmt::streamed(request.MethodId), fmt::streamed(ex.what()));
+      LOG_ERROR(Logger, "address_space_internal| exception while calling method: {}: {}", fmt::streamed(request.MethodId).value(), fmt::streamed(ex.what()).value());
       result.Status = StatusCode::BadUnexpectedError;
       return result;
     }
@@ -534,13 +534,13 @@ AddNodesResult AddressSpaceInMemory::AddNode(const AddNodesItem & item)
 {
   AddNodesResult result;
 
-  LOG_TRACE(Logger, "address_space_internal| adding new node id: '{}' name: '{}'", fmt::streamed(item.RequestedNewNodeId), fmt::streamed(item.BrowseName.Name));
+  LOG_TRACE(Logger, "address_space_internal| adding new node id: '{}' name: '{}'", fmt::streamed(item.RequestedNewNodeId).value(), fmt::streamed(item.BrowseName.Name).value());
 
   const NodeId resultId = GetNewNodeId(item.RequestedNewNodeId);
 
   if (!Nodes.empty() && resultId != ObjectId::Null && Nodes.find(resultId) != Nodes.end())
     {
-      LOG_ERROR(Logger, "address_space_internal| NodeId: '{}' already exists", fmt::streamed(resultId));
+      LOG_ERROR(Logger, "address_space_internal| NodeId: '{}' already exists", fmt::streamed(resultId).value());
       result.Status = StatusCode::BadNodeIdExists;
       return result;
     }
@@ -553,7 +553,7 @@ AddNodesResult AddressSpaceInMemory::AddNode(const AddNodesItem & item)
 
       if (parent_node_it == Nodes.end())
         {
-          LOG_ERROR(Logger, "address_space_internal| parent node '{}' does not exists", fmt::streamed(item.ParentNodeId));
+          LOG_ERROR(Logger, "address_space_internal| parent node '{}' does not exists", fmt::streamed(item.ParentNodeId).value());
           result.Status = StatusCode::BadParentNodeIdInvalid;
           return result;
         }

@@ -58,7 +58,7 @@ OpcTcpMessages::OpcTcpMessages(OpcUa::Services::SharedPtr server, OpcUa::OutputC
   , SequenceNb(0)
 {
   //LOG_INFO(Logger, "opc_tcp_processor     | log level: {}", Logger->level());
-  LOG_INFO(Logger, "opc_tcp_processor     | SessionId; {}", fmt::streamed(SessionId));
+  LOG_INFO(Logger, "opc_tcp_processor     | SessionId; {}", fmt::streamed(SessionId).value());
 }
 
 
@@ -131,7 +131,7 @@ bool OpcTcpMessages::ProcessMessage(MessageType msgType, IStreamBinary & iStream
 
     default:
     {
-      LOG_ERROR(Logger, "opc_tcp_processor     | unknown message type '{}' received", fmt::streamed(msgType));
+      LOG_ERROR(Logger, "opc_tcp_processor     | unknown message type '{}' received", fmt::streamed(msgType).value());
 
       throw std::logic_error("unknown message type received.");
     }
@@ -368,7 +368,7 @@ void OpcTcpMessages::ProcessRequest(IStreamBinary & istream, OStreamBinary & ost
                   Node node(Server, id.NodeId);
                   name = node.GetBrowseName().Name;
                 }
-              Logger->debug("opc_tcp_processor     |   {} ({})", fmt::streamed(id.NodeId), fmt::streamed(name));
+              Logger->debug("opc_tcp_processor     |   {} ({})", fmt::streamed(id.NodeId).value(), fmt::streamed(name).value());
             }
         }
 
@@ -892,7 +892,7 @@ void OpcTcpMessages::ProcessRequest(IStreamBinary & istream, OStreamBinary & ost
       secureHeader.AddSize(RawSize(sequence));
       secureHeader.AddSize(RawSize(response));
 
-      LOG_WARN(Logger, "opc_tcp_processor     | sending 'ServiceFaultResponse' to unsupported request of id: {}", fmt::streamed(message));
+      LOG_WARN(Logger, "opc_tcp_processor     | sending 'ServiceFaultResponse' to unsupported request of id: {}", fmt::streamed(message).value());
 
       ostream << secureHeader << algorithmHeader << sequence << response << flush;
       return;

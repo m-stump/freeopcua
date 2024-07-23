@@ -209,7 +209,7 @@ void OpcTcpConnection::ProcessHeader(const boost::system::error_code & error, st
 
   const std::size_t messageSize = header.Size - GetHeaderSize();
 
-  LOG_DEBUG(Logger, "opc_tcp_async         | received message: Type: {}, ChunkType: {}, Size: {}: DataSize: {}", fmt::streamed(header.Type), fmt::streamed(header.Chunk), fmt::streamed(header.Size), fmt::streamed(messageSize));
+  LOG_DEBUG(Logger, "opc_tcp_async         | received message: Type: {}, ChunkType: {}, Size: {}: DataSize: {}", fmt::streamed(header.Type).value().value(), fmt::streamed(header.Chunk).value(), fmt::streamed(header.Size).value(), fmt::streamed(messageSize).value());
 
   // do not lose reference to shared instance even if another
   // async operation decides to call GoodBye()
@@ -330,7 +330,7 @@ void OpcTcpServer::Listen()
 {
   LOG_DEBUG(Logger, "opc_tcp_async         | running server");
 
-  LOG_DEBUG(Logger, "opc_tcp_async         | waiting for client connection at: {}:{}", fmt::streamed(acceptor.local_endpoint().address()), fmt::streamed(acceptor.local_endpoint().port()));
+  LOG_DEBUG(Logger, "opc_tcp_async         | waiting for client connection at: {}:{}", fmt::streamed(acceptor.local_endpoint().address()).value(), fmt::streamed(acceptor.local_endpoint().port()).value());
   acceptor.listen();
 
   Accept();

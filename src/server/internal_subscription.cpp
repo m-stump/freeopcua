@@ -287,8 +287,8 @@ MonitoredItemCreateResult InternalSubscription::CreateMonitoredItem(const Monito
 
     if (request.ItemToMonitor.AttributeId == AttributeId::EventNotifier)
       {
-        LOG_DEBUG(Logger, "internal_subscription | id: {}, subscribe to event notifier", fmt::streamed(Data.SubscriptionId));
-        LOG_TRACE(Logger, "internal_subscription | id: {}, {}", fmt::streamed(Data.SubscriptionId), fmt::streamed(result.FilterResult));
+        LOG_DEBUG(Logger, "internal_subscription | id: {}, subscribe to event notifier", fmt::streamed(Data.SubscriptionId).value());
+        LOG_TRACE(Logger, "internal_subscription | id: {}, {}", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(result.FilterResult).value());
 
         // Client wants to subscribe to events
         // FIXME: check attribute EVENT notifier is set for the node
@@ -484,7 +484,7 @@ void InternalSubscription::DataChangeCallback(const uint32_t & m_id, const DataV
   event.Data.ClientHandle = monitoredDataChange.ClientHandle;
   event.Data.Value = value;
 
-  LOG_DEBUG(Logger, "internal_subscription | id: {}, enqueue TriggeredDataChange event: ClientHandle: {}", fmt::streamed(Data.SubscriptionId), fmt::streamed(event.Data.ClientHandle));
+  LOG_DEBUG(Logger, "internal_subscription | id: {}, enqueue TriggeredDataChange event: ClientHandle: {}", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(event.Data.ClientHandle).value());
 
   ++monitoredDataChange.TriggerCount;
   TriggeredDataChangeEvents.push_back(event);
@@ -498,7 +498,7 @@ void InternalSubscription::TriggerEvent(NodeId node, Event event)
 
   if (it == MonitoredEvents.end())
     {
-      LOG_DEBUG(Logger, "internal_subscription | id: {} does not monitor NodeId: {}", fmt::streamed(Data.SubscriptionId), fmt::streamed(node));
+      LOG_DEBUG(Logger, "internal_subscription | id: {} does not monitor NodeId: {}", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(node).value());
 
       return;
     }
@@ -509,7 +509,7 @@ void InternalSubscription::TriggerEvent(NodeId node, Event event)
 
 bool InternalSubscription::EnqueueEvent(uint32_t monitoredItemId, const Event & event)
 {
-  LOG_DEBUG(Logger, "internal_subscription | id: {}, EnqueEvent: {}", fmt::streamed(Data.SubscriptionId), fmt::streamed(event));
+  LOG_DEBUG(Logger, "internal_subscription | id: {}, EnqueEvent: {}", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(event).value());
 
   boost::unique_lock<boost::shared_mutex> lock(DbMutex);
 
@@ -518,7 +518,7 @@ bool InternalSubscription::EnqueueEvent(uint32_t monitoredItemId, const Event & 
 
   if (mii_it == MonitoredDataChanges.end())
     {
-      LOG_DEBUG(Logger, "internal_subscription | id: {}, MonitoredItemId: {} is already deleted", fmt::streamed(Data.SubscriptionId), fmt::streamed(monitoredItemId));
+      LOG_DEBUG(Logger, "internal_subscription | id: {}, MonitoredItemId: {} is already deleted", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(monitoredItemId).value());
 
       return false;
     }
@@ -553,7 +553,7 @@ std::vector<Variant> InternalSubscription::GetEventFields(const EventFilter & fi
 
       else
         {
-          LOG_DEBUG(Logger, "internal_subscription | id: {}, send value for: {}", fmt::streamed(Data.SubscriptionId), fmt::streamed(sattr.BrowsePath[0]));
+          LOG_DEBUG(Logger, "internal_subscription | id: {}, send value for: {}", fmt::streamed(Data.SubscriptionId).value(), fmt::streamed(sattr.BrowsePath[0]).value());
 
           if (sattr.BrowsePath[0] == QualifiedName("EventId", 0))
             {
@@ -577,7 +577,7 @@ std::vector<Variant> InternalSubscription::GetEventFields(const EventFilter & fi
 
           else if (sattr.BrowsePath[0] == QualifiedName("Message", 0))
             {
-              LOG_DEBUG(Logger, "internal_subscription | message is: {}", fmt::streamed(event.Message));
+              LOG_DEBUG(Logger, "internal_subscription | message is: {}", fmt::streamed(event.Message).value());
 
               fields.push_back(event.Message);
             }

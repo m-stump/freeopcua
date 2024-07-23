@@ -371,7 +371,7 @@ public:
       {
         for (ReadValueId attr : params.AttributesToRead)
           {
-            Logger->trace("binary_client         | Read: node id: {} attr id: {}", fmt::streamed(attr.NodeId), fmt::streamed(ToString(attr.AttributeId)));
+            Logger->trace("binary_client         | Read: node id: {} attr id: {}", fmt::streamed(attr.NodeId).value(), fmt::streamed(ToString(attr.AttributeId)).value());
           }
       }
 
@@ -558,7 +558,7 @@ public:
   virtual std::vector<MonitoredItemCreateResult> CreateMonitoredItems(const MonitoredItemsParameters & parameters) override
   {
     LOG_DEBUG(Logger, "binary_client         | CreateMonitoredItems -->");
-    LOG_TRACE(Logger, "binary_client         | {}", fmt::streamed(parameters));
+    LOG_TRACE(Logger, "binary_client         | {}", fmt::streamed(parameters).value());
 
     CreateMonitoredItemsRequest request;
     request.Parameters = parameters;
@@ -700,7 +700,7 @@ public:
       {
         for (BrowseDescription desc : query.NodesToBrowse)
           {
-            Logger->trace("Node: {}", fmt::streamed(desc.NodeToBrowse));
+            Logger->trace("Node: {}", fmt::streamed(desc.NodeToBrowse).value());
           }
       }
 
@@ -763,7 +763,7 @@ public:
 
         for (auto & param : params)
           {
-            Logger->trace("    {}", fmt::streamed(param));
+            Logger->trace("    {}", fmt::streamed(param).value());
           }
       }
 
@@ -778,7 +778,7 @@ public:
 
         for (auto & id : response.Result)
           {
-            Logger->trace("    {}", fmt::streamed(id));
+            Logger->trace("    {}", fmt::streamed(id).value());
           }
       }
     LOG_DEBUG(Logger, "binary_client         | RegisterNodes <--");
@@ -794,7 +794,7 @@ public:
 
         for (auto & id : params)
           {
-            Logger->trace("    {}", fmt::streamed(id));
+            Logger->trace("    {}", fmt::streamed(id).value());
           }
       }
 
@@ -879,7 +879,7 @@ private:
     Callbacks.insert(std::make_pair(request.Header.RequestHandle, responseCallback));
     lock.unlock();
 
-    LOG_DEBUG(Logger, "binary_client         | send: id: {} handle: {}, UtcTime: {}", fmt::streamed(ToString(request.TypeId, true)), fmt::streamed(request.Header.RequestHandle), fmt::streamed(request.Header.UtcTime));
+    LOG_DEBUG(Logger, "binary_client         | send: id: {} handle: {}, UtcTime: {}", fmt::streamed(ToString(request.TypeId, true)).value(), fmt::streamed(request.Header.RequestHandle), fmt::streamed(request.Header.UtcTime).value());
 
     Send(request);
 
@@ -928,7 +928,7 @@ private:
   {
     Binary::SecureHeader responseHeader;
     Stream >> responseHeader;
-    LOG_DEBUG(Logger, "binary_client         | received message: Type: {}, ChunkType: {}, Size: {}, ChannelId: {}", fmt::streamed(responseHeader.Type), fmt::streamed(responseHeader.Chunk), fmt::streamed(responseHeader.Size), fmt::streamed(responseHeader.ChannelId));
+    LOG_DEBUG(Logger, "binary_client         | received message: Type: {}, ChunkType: {}, Size: {}, ChannelId: {}", fmt::streamed(responseHeader.Type).value(), fmt::streamed(responseHeader.Chunk).value(), fmt::streamed(responseHeader.Size).value(), fmt::streamed(responseHeader.ChannelId).value());
 
     size_t algo_size;
 
@@ -982,7 +982,7 @@ private:
 
         if (callbackIt == Callbacks.end())
           {
-            LOG_WARN(Logger, "binary_client         | no callback found for message id: {}, handle: {}", fmt::streamed(id), fmt::streamed(header.RequestHandle));
+            LOG_WARN(Logger, "binary_client         | no callback found for message id: {}, handle: {}", fmt::streamed(id).value(), fmt::streamed(header.RequestHandle).value());
             messageBuffer.clear();
             return;
           }
@@ -1013,15 +1013,15 @@ private:
         in >> id;
         in >> header;
 
-        LOG_DEBUG(Logger, "binary_client         | got response id: {}, handle: {}", ToString(id, true), fmt::streamed(header.RequestHandle));
+        LOG_DEBUG(Logger, "binary_client         | got response id: {}, handle: {}", ToString(id, true), fmt::streamed(header.RequestHandle).value());
 
         if (id == SERVICE_FAULT)
           {
-            LOG_WARN(Logger, "binary_client         | receive ServiceFault from Server with StatusCode: {}", fmt::streamed(header.ServiceResult));
+            LOG_WARN(Logger, "binary_client         | receive ServiceFault from Server with StatusCode: {}", fmt::streamed(header.ServiceResult).value());
           }
         else if (header.ServiceResult != StatusCode::Good)
           {
-            LOG_WARN(Logger, "binary_client         | received a response from server with error status: {}", fmt::streamed(header.ServiceResult));
+            LOG_WARN(Logger, "binary_client         | received a response from server with error status: {}", fmt::streamed(header.ServiceResult).value());
           }
 
         messageBuffer.insert(messageBuffer.end(), buffer.begin(), buffer.end());
